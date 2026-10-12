@@ -72,51 +72,47 @@ if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') {
     const introTrigger = {
       trigger: '.hero',
       start: 'top top',
-      end: '+=800',
+      end: mobileLayout ? '+=500' : '+=800',
       scrub: 1,
-      pin: !mobileLayout,
+      pin: true,
       anticipatePin: 1
     };
-    if (!mobileLayout) {
-      introTrigger.onUpdate = updateLogoLayout;
-      introTrigger.onRefresh = updateLogoLayout;
-    }
+    introTrigger.onUpdate = updateLogoLayout;
+    introTrigger.onRefresh = updateLogoLayout;
 
     const introTl = gsap.timeline({ scrollTrigger: introTrigger });
 
-    if (!mobileLayout) {
-      introTl.to('.logo-dynamic', {
-        top: '2.5rem',
-        left: '4rem',
-        transform: 'translate(0, 0)',
-        gap: '0.8rem',
-        ease: 'power2.inOut',
-        duration: 0.5
-      }, 0);
+    introTl.to('.logo-dynamic', {
+      top: mobileLayout ? '1.25rem' : '2.5rem',
+      left: mobileLayout ? '1rem' : '4rem',
+      transform: 'translate(0, 0)',
+      gap: mobileLayout ? '0.6rem' : '0.8rem',
+      ease: 'power2.inOut',
+      duration: 0.6
+    }, 0);
 
-      introTl.to('.logo-img', {
-        height: '35px',
-        ease: 'power2.inOut',
-        duration: 0.5
-      }, 0);
+    introTl.to('.logo-img', {
+      height: '35px',
+      ease: 'power2.inOut',
+      duration: 0.6
+    }, 0);
 
-      introTl.to('.logo-text', {
-        fontSize: '0.9rem',
-        letterSpacing: '0.05em',
-        ease: 'power2.inOut',
-        duration: 0.5
-      }, 0);
+    introTl.to('.logo-text', {
+      fontSize: mobileLayout ? '0.75rem' : '0.9rem',
+      letterSpacing: '0.05em',
+      ease: 'power2.inOut',
+      duration: 0.6
+    }, 0);
 
-      introTl.to('.nav-glass', {
-        opacity: 1,
-        y: 0,
-        ease: 'power2.out',
-        duration: 0.5,
-        onUpdate() {
-          this.targets()[0].style.pointerEvents = this.progress() > 0.05 ? 'auto' : 'none';
-        }
-      }, 0.2);
-    }
+    introTl.to('.nav-glass', {
+      opacity: 1,
+      y: 0,
+      ease: 'power2.out',
+      duration: 0.5,
+      onUpdate() {
+        this.targets()[0].style.pointerEvents = this.progress() > 0.05 ? 'auto' : 'none';
+      }
+    }, 0.2);
 
     introTl.from('.hero-content', {
       opacity: 0,
