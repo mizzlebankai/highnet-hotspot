@@ -1,0 +1,173 @@
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+  anchor.addEventListener('click', event => {
+    const targetId = anchor.getAttribute('href').slice(1);
+    const target = targetId ? document.getElementById(targetId) : null;
+    if (target) {
+      event.preventDefault();
+      target.scrollIntoView({ behavior: 'smooth' });
+    }
+  });
+});
+
+if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') {
+  console.error('GSAP and ScrollTrigger are required for the hero scroll animation.');
+} else {
+  gsap.registerPlugin(ScrollTrigger);
+
+  gsap.matchMedia().add({
+    isMobile: '(max-width: 768px)',
+    isDesktop: '(min-width: 769px)'
+  }, ({ conditions }) => {
+    const mobileLayout = conditions.isMobile;
+    const logo = document.querySelector('.logo-dynamic');
+
+    const updateLogoLayout = self => {
+      const flexDirection = self.progress >= 0.5 ? 'row' : 'column';
+      if (logo.style.flexDirection !== flexDirection) {
+        logo.style.flexDirection = flexDirection;
+      }
+    };
+
+    const introTrigger = {
+      trigger: '.hero',
+      start: 'top top',
+      end: '+=800',
+      scrub: 1,
+      pin: !mobileLayout,
+      anticipatePin: 1
+    };
+    if (!mobileLayout) {
+      introTrigger.onUpdate = updateLogoLayout;
+      introTrigger.onRefresh = updateLogoLayout;
+    }
+
+    const introTl = gsap.timeline({ scrollTrigger: introTrigger });
+
+    if (!mobileLayout) {
+      introTl.to('.logo-dynamic', {
+        top: '2.5rem',
+        left: '4rem',
+        transform: 'translate(0, 0)',
+        gap: '0.8rem',
+        ease: 'power2.inOut',
+        duration: 0.5
+      }, 0);
+
+      introTl.to('.logo-img', {
+        height: '35px',
+        ease: 'power2.inOut',
+        duration: 0.5
+      }, 0);
+
+      introTl.to('.logo-text', {
+        fontSize: '0.9rem',
+        letterSpacing: '0.05em',
+        ease: 'power2.inOut',
+        duration: 0.5
+      }, 0);
+
+      introTl.to('.nav-glass', {
+        opacity: 1,
+        y: 0,
+        ease: 'power2.out',
+        duration: 0.5,
+        onUpdate() {
+          this.targets()[0].style.pointerEvents = this.progress() > 0.05 ? 'auto' : 'none';
+        }
+      }, 0.2);
+    }
+
+    introTl.from('.hero-content', {
+      opacity: 0,
+      y: 30,
+      ease: 'power2.out'
+    }, 0.3);
+
+    introTl.from('.hero-graphic-wrapper', {
+      opacity: 0,
+      scale: 0.9,
+      duration: 0.5,
+      ease: 'power2.out'
+    }, 0.3);
+
+    gsap.utils.toArray('.reveal').forEach(element => {
+      gsap.from(element, {
+        scrollTrigger: {
+          trigger: element,
+          start: 'top 85%',
+          toggleActions: 'play none none reverse'
+        },
+        y: 40,
+        opacity: 0,
+        duration: 1,
+        ease: 'power3.out'
+      });
+    });
+
+    const nav = document.querySelector('.nav-glass');
+    const navIndicator = nav.querySelector('.nav-indicator');
+    const navLinks = [...nav.querySelectorAll('a')];
+    let activeNavLink = null;
+
+    const moveIndicator = (link, updateActiveLink = true) => {
+      if (!link) {
+        gsap.to(navIndicator, { opacity: 0, duration: 0.3 });
+        return;
+      }
+
+      gsap.to(navIndicator, {
+        left: link.offsetLeft,
+        width: link.offsetWidth,
+        opacity: 1,
+        duration: 0.4,
+        ease: 'power2.out'
+      });
+
+      if (updateActiveLink) {
+        activeNavLink = link;
+        navLinks.forEach(navLink => navLink.classList.toggle('active', navLink === link));
+      }
+    };
+
+    navLinks.forEach(link => {
+      link.addEventListener('mouseenter', () => moveIndicator(link, false));
+      link.addEventListener('focus', () => moveIndicator(link, false));
+    });
+
+    const restoreActiveIndicator = () => moveIndicator(activeNavLink);
+    nav.addEventListener('mouseleave', restoreActiveIndicator);
+    nav.addEventListener('focusout', event => {
+      if (!nav.contains(event.relatedTarget)) {
+        restoreActiveIndicator();
+      }
+    });
+
+    document.querySelectorAll('section[id], footer[id]').forEach(section => {
+      const link = nav.querySelector(`a[href="#${section.id}"]`);
+      if (!link) return;
+
+      ScrollTrigger.create({
+        trigger: section,
+        start: 'top 85%',
+        end: 'bottom 15%',
+        onEnter: () => moveIndicator(link),
+        onEnterBack: () => moveIndicator(link),
+        onLeaveBack: () => {
+          if (activeNavLink === link) {
+            const precedingSection = [...document.querySelectorAll('section[id], footer[id]')]
+              .filter(candidate => candidate !== section
+                && candidate.getBoundingClientRect().top < section.getBoundingClientRect().top)
+              .pop();
+            activeNavLink = precedingSection
+              ? nav.querySelector(`a[href="#${precedingSection.id}"]`)
+              : null;
+            navLinks.forEach(navLink => navLink.classList.toggle('active', navLink === activeNavLink));
+            moveIndicator(activeNavLink, false);
+          }
+        }
+      });
+    });
+
+    gsap.set(navIndicator, { opacity: 0 });
+  });
+}
