@@ -9,6 +9,47 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
   });
 });
 
+const availabilityForm = document.querySelector('.availability-form');
+const formStatus = document.querySelector('.form-status');
+
+if (availabilityForm && formStatus) {
+  availabilityForm.addEventListener('submit', async event => {
+    event.preventDefault();
+
+    const submitButton = availabilityForm.querySelector('button[type="submit"]');
+    submitButton.disabled = true;
+    formStatus.hidden = true;
+    formStatus.className = 'form-status';
+    formStatus.setAttribute('role', 'status');
+    formStatus.textContent = 'Sending your request...';
+    formStatus.hidden = false;
+
+    try {
+      const response = await fetch(availabilityForm.action, {
+        method: 'POST',
+        body: new FormData(availabilityForm),
+        headers: { Accept: 'application/json' }
+      });
+
+      if (!response.ok) {
+        throw new Error(`Form submission failed with status ${response.status}.`);
+      }
+
+      availabilityForm.hidden = true;
+      formStatus.textContent = "Thank you! We'll check your area and get back to you shortly.";
+      formStatus.classList.add('is-success');
+      formStatus.hidden = false;
+    } catch (error) {
+      console.error('Availability form submission failed.', error);
+      formStatus.textContent = 'We could not submit your request. Please check your connection and try again.';
+      formStatus.classList.add('is-error');
+      formStatus.setAttribute('role', 'alert');
+      formStatus.hidden = false;
+      submitButton.disabled = false;
+    }
+  });
+}
+
 if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') {
   console.error('GSAP and ScrollTrigger are required for the hero scroll animation.');
 } else {

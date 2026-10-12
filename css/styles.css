@@ -321,6 +321,20 @@ section {
   margin: 0 auto;
 }
 
+.form-status {
+  max-width: 400px;
+  margin: 1.5rem auto 0;
+  text-align: center;
+}
+
+.form-status.is-success {
+  color: #1E5BEB;
+}
+
+.form-status.is-error {
+  color: #A12626;
+}
+
 .availability-form input {
   padding: 1rem 0;
   border: none;
@@ -361,6 +375,14 @@ section {
   color: #B0C4DE;
 }
 
+.contact-actions {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin: 1.25rem 0;
+}
+
 .contact a {
   display: inline-flex;
   align-items: center;
@@ -368,6 +390,23 @@ section {
   color: #FFFFFF;
   text-decoration: underline;
   text-underline-offset: 3px;
+}
+
+.contact .contact-action {
+  justify-content: center;
+  min-width: 8.5rem;
+  padding: 0.7rem 1.1rem;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 999px;
+  font-size: 0.9rem;
+  text-decoration: none;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.contact .contact-action:hover,
+.contact .contact-action:focus-visible {
+  background-color: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.75);
 }
 
 .contact a .bi {
