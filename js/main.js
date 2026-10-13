@@ -58,74 +58,43 @@ if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') {
   gsap.matchMedia().add({
     isMobile: '(max-width: 768px)',
     isDesktop: '(min-width: 769px)'
-  }, ({ conditions }) => {
-    const mobileLayout = conditions.isMobile;
-    const logo = document.querySelector('.logo-dynamic');
-
-    const updateLogoLayout = self => {
-      const flexDirection = self.progress >= 0.5 ? 'row' : 'column';
-      if (logo.style.flexDirection !== flexDirection) {
-        logo.style.flexDirection = flexDirection;
+  }, () => {
+    const introTl = gsap.timeline({
+      scrollTrigger: {
+        trigger: '.hero',
+        start: 'top top',
+        end: '+=1000',
+        scrub: 1,
+        pin: true,
+        anticipatePin: 1
       }
-    };
+    });
 
-    const introTrigger = {
-      trigger: '.hero',
-      start: 'top top',
-      end: mobileLayout ? '+=500' : '+=800',
-      scrub: 1,
-      pin: true,
-      anticipatePin: 1
-    };
-    introTrigger.onUpdate = updateLogoLayout;
-    introTrigger.onRefresh = updateLogoLayout;
-
-    const introTl = gsap.timeline({ scrollTrigger: introTrigger });
+    introTl.to('.hero-graphic-wrapper', {
+      scale: 2.5,
+      opacity: 0.18,
+      duration: 1.4,
+      ease: 'power2.inOut'
+    }, 0);
 
     introTl.to('.logo-dynamic', {
-      top: mobileLayout ? '1.25rem' : '2.5rem',
-      left: mobileLayout ? '1rem' : '4rem',
-      transform: 'translate(0, 0)',
-      gap: mobileLayout ? '0.6rem' : '0.8rem',
-      ease: 'power2.inOut',
-      duration: 0.6
-    }, 0);
-
-    introTl.to('.logo-img', {
-      height: '35px',
-      ease: 'power2.inOut',
-      duration: 0.6
-    }, 0);
-
-    introTl.to('.logo-text', {
-      fontSize: mobileLayout ? '0.75rem' : '0.9rem',
-      letterSpacing: '0.05em',
-      ease: 'power2.inOut',
-      duration: 0.6
-    }, 0);
+      opacity: 1,
+      pointerEvents: 'auto',
+      ease: 'power2.out'
+    }, 0.4);
 
     introTl.to('.nav-glass', {
       opacity: 1,
       y: 0,
-      ease: 'power2.out',
-      duration: 0.5,
-      onUpdate() {
-        this.targets()[0].style.pointerEvents = this.progress() > 0.05 ? 'auto' : 'none';
-      }
-    }, 0.2);
+      pointerEvents: 'auto',
+      ease: 'power2.out'
+    }, 0.5);
 
     introTl.from('.hero-content', {
       opacity: 0,
       y: 30,
       ease: 'power2.out'
-    }, 0.3);
-
-    introTl.from('.hero-graphic-wrapper', {
-      opacity: 0,
-      scale: 0.9,
-      duration: 0.5,
-      ease: 'power2.out'
-    }, 0.3);
+    }, 0.6);
 
     gsap.utils.toArray('.reveal').forEach(element => {
       gsap.from(element, {
