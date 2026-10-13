@@ -58,22 +58,23 @@ if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') {
   gsap.matchMedia().add({
     isMobile: '(max-width: 768px)',
     isDesktop: '(min-width: 769px)'
-  }, () => {
+  }, ({ conditions }) => {
+    const isMobile = conditions.isMobile;
     const introTl = gsap.timeline({
       scrollTrigger: {
         trigger: '.hero',
         start: 'top top',
-        end: '+=1000',
-        scrub: 1,
+        end: isMobile ? '+=450' : '+=650',
+        scrub: 0.4,
         pin: true,
         anticipatePin: 1
       }
     });
 
     introTl.to('.hero-graphic-wrapper', {
-      scale: 2.5,
+      scale: isMobile ? 1.5 : 1.8,
       opacity: 0.18,
-      duration: 1.4,
+      duration: 1.2,
       ease: 'power2.inOut'
     }, 0);
 
